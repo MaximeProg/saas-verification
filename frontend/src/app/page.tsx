@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Shield, Zap, Lock, CheckCircle, ArrowRight, Code, Users, ChevronDown, ChevronUp, Smartphone, Globe, FileCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -67,10 +68,10 @@ export default function HomePage() {
           <div className="grid items-center gap-8 md:gap-12 lg:gap-16 lg:grid-cols-2">
             <div>
               <h1 className="mb-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-                Plateforme de Vérification d'Identité KYC
+                Plateforme de Vérification d&apos;Identité KYC
               </h1>
               <p className="mb-6 text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
-                Gérez les vérifications d'identité de vos utilisateurs avec notre plateforme sécurisée. 
+                Gérez les vérifications d&apos;identité de vos utilisateurs avec notre plateforme sécurisée. 
                 API REST complète, webhooks en temps réel et dashboards intuitifs.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
@@ -90,9 +91,11 @@ export default function HomePage() {
 
             <div className="relative w-full">
               <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-muted/50">
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=600&fit=crop" 
-                  alt="Vérification d'identité sécurisée"
+                  alt="Vérification d&apos;identité sécurisée"
+                  width={800}
+                  height={600}
                   className="h-full w-full max-w-full object-cover"
                 />
               </div>
@@ -114,9 +117,11 @@ export default function HomePage() {
             <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 md:mb-12 lg:mb-16">
               <Card className="group overflow-hidden border-2 transition-all hover:shadow-lg">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-muted to-muted/50">
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1633265486064-086b219458ec?w=600&h=400&fit=crop" 
                     alt="Sécurité"
+                    width={600}
+                    height={400}
                     className="h-full w-full object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
@@ -219,9 +224,11 @@ export default function HomePage() {
 
               <Card className="group overflow-hidden border-2 transition-all hover:shadow-lg">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-muted to-muted/50">
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop" 
                     alt="Mobile"
+                    width={600}
+                    height={400}
                     className="h-full w-full object-cover transition-transform group-hover:scale-105"
                   />
                 </div>
@@ -246,7 +253,7 @@ export default function HomePage() {
                     Intégration Simple et Rapide
                   </h3>
                   <p className="mb-4 text-base text-muted-foreground sm:mb-6 sm:text-lg">
-                    Notre API REST vous permet d'intégrer la vérification KYC dans votre application en quelques minutes. 
+                    Notre API REST vous permet d&apos;intégrer la vérification KYC dans votre application en quelques minutes. 
                     Documentation complète, exemples de code et support technique inclus.
                   </p>
                   <ul className="space-y-3">
@@ -269,9 +276,11 @@ export default function HomePage() {
                   </ul>
                 </div>
                 <div className="h-full">
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop" 
                     alt="Développement"
+                    width={800}
+                    height={600}
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -294,9 +303,11 @@ export default function HomePage() {
             <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
               <Card className="overflow-hidden border-2">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-600/10">
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop" 
                     alt="API REST"
+                    width={600}
+                    height={400}
                     className="h-full w-full object-cover opacity-80"
                   />
                 </div>
@@ -322,9 +333,11 @@ export default function HomePage() {
 
               <Card className="overflow-hidden border-2">
                 <div className="aspect-video overflow-hidden bg-gradient-to-br from-green-500/10 to-green-600/10">
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" 
                     alt="Webhooks"
+                    width={600}
+                    height={400}
                     className="h-full w-full object-cover opacity-80"
                   />
                 </div>
@@ -380,9 +393,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&h=400&fit=crop" 
                           alt="API Documentation"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -408,9 +423,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" 
                           alt="Webhooks Configuration"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -436,9 +453,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&h=400&fit=crop" 
                           alt="Stockage sécurisé"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -464,9 +483,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&h=400&fit=crop" 
                           alt="Plans d'abonnement"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -492,9 +513,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=600&h=400&fit=crop" 
                           alt="Gestion des clés API"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -520,9 +543,11 @@ export default function HomePage() {
                         </p>
                       </div>
                       <div className="overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop" 
                           alt="Dashboard statistiques"
+                          width={600}
+                          height={400}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -617,9 +642,11 @@ export default function HomePage() {
         <section className="relative w-full max-w-full overflow-hidden py-16 md:py-24 lg:py-32">
           {/* Background with single image */}
           <div className="absolute inset-0 -z-10 w-full">
-            <img 
+            <Image 
               src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&h=1080&fit=crop" 
               alt="Team collaboration"
+              width={1920}
+              height={1080}
               className="h-full w-full max-w-full object-cover"
             />
             <div className="absolute inset-0 w-full bg-gradient-to-r from-black/90 via-black/85 to-black/90" />
@@ -637,7 +664,7 @@ export default function HomePage() {
               </h2>
               
               <p className="mb-8 text-base text-gray-300 sm:text-lg md:mb-12 md:text-xl lg:text-2xl">
-                Rejoignez des centaines d'entreprises qui font confiance à notre plateforme pour sécuriser leurs vérifications d'identité.
+                Rejoignez des centaines d&apos;entreprises qui font confiance à notre plateforme pour sécuriser leurs vérifications d&apos;identité.
               </p>
 
               <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:justify-center md:mb-12">

@@ -13,11 +13,11 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold leading-tight">KYC Platform</span>
-                <span className="text-xs text-muted-foreground">Vérification d'identité</span>
+                <span className="text-xs text-muted-foreground">Vérification d&apos;identité</span>
               </div>
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Solution professionnelle de vérification d'identité KYC/AML pour entreprises. Sécurisé, rapide et conforme.
+              Solution professionnelle de vérification d&apos;identité KYC/AML pour entreprises. Sécurisé, rapide et conforme.
             </p>
             <div className="flex gap-3">
               <a href="#" className="rounded-lg bg-muted p-2 transition-colors hover:bg-emerald-600 hover:text-white">
@@ -102,7 +102,7 @@ export function Footer() {
               Politique de confidentialité
             </Link>
             <Link href="#" className="transition-colors hover:text-emerald-600">
-              Conditions d'utilisation
+              Conditions d&apos;utilisation
             </Link>
             <Link href="#" className="transition-colors hover:text-emerald-600">
               Mentions légales

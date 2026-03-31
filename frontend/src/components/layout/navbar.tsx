@@ -20,7 +20,7 @@ export function Navbar() {
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-bold leading-tight md:text-xl">KYC Platform</span>
-                <span className="hidden text-xs text-muted-foreground md:inline">Vérification d'identité</span>
+                <span className="hidden text-xs text-muted-foreground md:inline">Vérification d&apos;identité</span>
               </div>
             </Link>
           </div>

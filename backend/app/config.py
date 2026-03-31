@@ -68,6 +68,14 @@ class Settings(BaseSettings):
     FEDAPAY_ENVIRONMENT: str = "sandbox"  # sandbox ou live
     FEDAPAY_CALLBACK_URL: str = "http://localhost:8000/api/v1/payments/fedapay/callback"
     
+    # CORS Configuration
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
+    
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Convertit la chaîne d'origines en liste"""
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

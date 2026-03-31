@@ -1,0 +1,918 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Book, Key, Webhook, FileText, AlertCircle, CheckCircle, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
+
+type Section = 'introduction' | 'authentication' | 'initiate' | 'retrieve' | 'list' | 'status' | 'webhooks' | 'errors'
+
+export default function DocsPage() {
+  const [activeSection, setActiveSection] = useState<Section>('introduction')
+  const [activeLanguage, setActiveLanguage] = useState<'curl' | 'javascript' | 'python' | 'php'>('curl')
+
+  const menuSections = [
+    {
+      title: 'Démarrage',
+      items: [
+        { id: 'introduction' as Section, label: 'Introduction', icon: Book },
+        { id: 'authentication' as Section, label: 'Authentification', icon: Key },
+      ]
+    },
+    {
+      title: 'Vérifications KYC',
+      items: [
+        { id: 'initiate' as Section, label: '1. Initier une vérification', icon: FileText },
+        { id: 'retrieve' as Section, label: '2. Récupérer une vérification', icon: CheckCircle },
+        { id: 'list' as Section, label: '3. Lister les vérifications', icon: FileText },
+        { id: 'status' as Section, label: '4. Vérifier le statut', icon: CheckCircle },
+      ]
+    },
+    {
+      title: 'Avancé',
+      items: [
+        { id: 'webhooks' as Section, label: 'Webhooks', icon: Webhook },
+        { id: 'errors' as Section, label: 'Gestion des erreurs', icon: AlertCircle },
+      ]
+    }
+  ]
+
+  const codeExamples = {
+    introduction: {
+      curl: `# URL de base
+https://api.kycplatform.com/api/v1
+
+# Headers requis
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json`,
+      javascript: `const API_URL = 'https://api.kycplatform.com/api/v1';
+const API_KEY = 'your_api_key_here';
+
+const headers = {
+  'Authorization': \`Bearer \${API_KEY}\`,
+  'Content-Type': 'application/json'
+};`,
+      python: `API_URL = 'https://api.kycplatform.com/api/v1'
+API_KEY = 'your_api_key_here'
+
+headers = {
+    'Authorization': f'Bearer {API_KEY}',
+    'Content-Type': 'application/json'
+}`,
+      php: `<?php
+$apiUrl = 'https://api.kycplatform.com/api/v1';
+$apiKey = 'your_api_key_here';
+
+$headers = [
+    'Authorization: Bearer ' . $apiKey,
+    'Content-Type: application/json'
+];`
+    },
+    authentication: {
+      curl: `curl -X POST https://api.kycplatform.com/api/v1/auth/token \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "email": "votre@email.com",
+    "password": "votre_mot_de_passe"
+  }'`,
+      javascript: `const response = await fetch(\`\${API_URL}/auth/token\`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'votre@email.com',
+    password: 'votre_mot_de_passe'
+  })
+});
+
+const data = await response.json();
+console.log('Token:', data.access_token);`,
+      python: `import requests
+
+response = requests.post(
+    f'{API_URL}/auth/token',
+    json={
+        'email': 'votre@email.com',
+        'password': 'votre_mot_de_passe'
+    }
+)
+
+data = response.json()
+print('Token:', data['access_token'])`,
+      php: `<?php
+$ch = curl_init($apiUrl . '/auth/token');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    'email' => 'votre@email.com',
+    'password' => 'votre_mot_de_passe'
+]));
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$data = json_decode($response, true);
+echo 'Token: ' . $data['access_token'];`
+    },
+    verifications: {
+      curl: `# 1. Initier une vérification
+curl -X POST https://api.kycplatform.com/api/v1/verifications/initiate \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "full_name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+229XXXXXXXX",
+    "country": "BJ",
+    "external_reference": "USER-12345",
+    "verification_type": "document"
+  }'
+
+# 2. Récupérer une vérification
+curl -X GET https://api.kycplatform.com/api/v1/verifications/KYC-2026000001 \\
+  -H "Authorization: Bearer YOUR_API_KEY"`,
+      javascript: `// 1. Initier une vérification
+const response = await fetch(\`\${API_URL}/verifications/initiate\`, {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({
+    full_name: 'John Doe',
+    email: 'john@example.com',
+    phone: '+229XXXXXXXX',
+    country: 'BJ',
+    external_reference: 'USER-12345',
+    verification_type: 'document'
+  })
+});
+
+const data = await response.json();
+console.log('Verification ID:', data.verification_id);
+console.log('Verification URL:', data.verification_url);
+
+// 2. Envoyer le lien à l'utilisateur
+await sendEmailToUser(data.email, data.verification_url);
+
+// 3. Récupérer le statut
+const status = await fetch(\`\${API_URL}/verifications/\${data.verification_id}\`, {
+  headers
+});
+const verification = await status.json();
+console.log('Status:', verification.status);`,
+      python: `# 1. Initier une vérification
+response = requests.post(
+    f'{API_URL}/verifications/initiate',
+    headers=headers,
+    json={
+        'full_name': 'John Doe',
+        'email': 'john@example.com',
+        'phone': '+229XXXXXXXX',
+        'country': 'BJ',
+        'external_reference': 'USER-12345',
+        'verification_type': 'document'
+    }
+)
+
+data = response.json()
+print('Verification ID:', data['verification_id'])
+print('Verification URL:', data['verification_url'])
+
+# 2. Envoyer le lien à l'utilisateur
+send_email_to_user(data['email'], data['verification_url'])
+
+# 3. Récupérer le statut
+status = requests.get(
+    f'{API_URL}/verifications/{data["verification_id"]}',
+    headers=headers
+)
+verification = status.json()
+print('Status:', verification['status'])`,
+      php: `<?php
+// 1. Initier une vérification
+$data = [
+    'full_name' => 'John Doe',
+    'email' => 'john@example.com',
+    'phone' => '+229XXXXXXXX',
+    'country' => 'BJ',
+    'external_reference' => 'USER-12345',
+    'verification_type' => 'document'
+];
+
+$ch = curl_init($apiUrl . '/verifications/initiate');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$result = json_decode($response, true);
+
+echo 'Verification ID: ' . $result['verification_id'];
+echo 'Verification URL: ' . $result['verification_url'];
+
+// 2. Envoyer le lien à l'utilisateur
+sendEmailToUser($result['email'], $result['verification_url']);
+
+// 3. Récupérer le statut
+$ch = curl_init($apiUrl . '/verifications/' . $result['verification_id']);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$verification = json_decode(curl_exec($ch), true);
+echo 'Status: ' . $verification['status'];`
+    },
+    webhooks: {
+      curl: `# Configuration du webhook
+curl -X POST https://api.kycplatform.com/api/v1/webhooks \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "url": "https://votre-site.com/webhook",
+    "events": ["verification.completed", "verification.failed"]
+  }'`,
+      javascript: `// Configurer le webhook
+const webhook = await fetch(\`\${API_URL}/webhooks\`, {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({
+    url: 'https://votre-site.com/webhook',
+    events: ['verification.completed', 'verification.failed']
+  })
+});
+
+// Recevoir les événements
+app.post('/webhook', (req, res) => {
+  const event = req.body;
+  console.log('Event:', event.type);
+  console.log('Verification ID:', event.verification_id);
+  res.status(200).send('OK');
+});`,
+      python: `# Configurer le webhook
+response = requests.post(
+    f'{API_URL}/webhooks',
+    headers=headers,
+    json={
+        'url': 'https://votre-site.com/webhook',
+        'events': ['verification.completed', 'verification.failed']
+    }
+)
+
+# Recevoir les événements (Flask)
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    event = request.json
+    print('Event:', event['type'])
+    print('Verification ID:', event['verification_id'])
+    return 'OK', 200`,
+      php: `<?php
+// Configurer le webhook
+$webhookData = [
+    'url' => 'https://votre-site.com/webhook',
+    'events' => ['verification.completed', 'verification.failed']
+];
+
+$ch = curl_init($apiUrl . '/webhooks');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($webhookData));
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_exec($ch);
+
+// Recevoir les événements
+$payload = file_get_contents('php://input');
+$event = json_decode($payload, true);
+echo 'Event: ' . $event['type'];`
+    },
+    errors: {
+      curl: `# Exemple de réponse d'erreur
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Le champ 'document_type' est requis",
+    "details": {
+      "field": "document_type",
+      "reason": "missing_field"
+    }
+  }
+}`,
+      javascript: `try {
+  const response = await fetch(\`\${API_URL}/verifications\`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(data)
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('Error:', error.error.message);
+    console.error('Code:', error.error.code);
+  }
+} catch (err) {
+  console.error('Network error:', err);
+}`,
+      python: `try:
+    response = requests.post(
+        f'{API_URL}/verifications',
+        headers=headers,
+        json=data
+    )
+    response.raise_for_status()
+except requests.exceptions.HTTPError as err:
+    error = err.response.json()
+    print('Error:', error['error']['message'])
+    print('Code:', error['error']['code'])`,
+      php: `<?php
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+if ($httpCode >= 400) {
+    $error = json_decode($response, true);
+    echo 'Error: ' . $error['error']['message'];
+    echo 'Code: ' . $error['error']['code'];
+}`
+    },
+    'rate-limits': {
+      curl: `# Headers de réponse
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1640995200`,
+      javascript: `const response = await fetch(\`\${API_URL}/verifications\`, {
+  method: 'GET',
+  headers
+});
+
+// Vérifier les limites
+const limit = response.headers.get('X-RateLimit-Limit');
+const remaining = response.headers.get('X-RateLimit-Remaining');
+const reset = response.headers.get('X-RateLimit-Reset');
+
+console.log(\`Limite: \${limit}, Restant: \${remaining}\`);`,
+      python: `response = requests.get(
+    f'{API_URL}/verifications',
+    headers=headers
+)
+
+# Vérifier les limites
+limit = response.headers.get('X-RateLimit-Limit')
+remaining = response.headers.get('X-RateLimit-Remaining')
+reset = response.headers.get('X-RateLimit-Reset')
+
+print(f'Limite: {limit}, Restant: {remaining}')`,
+      php: `<?php
+$response = curl_exec($ch);
+$headers = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+
+// Extraire les headers de limite
+preg_match('/X-RateLimit-Limit: (\d+)/', $headers, $limit);
+preg_match('/X-RateLimit-Remaining: (\d+)/', $headers, $remaining);
+
+echo 'Limite: ' . $limit[1] . ', Restant: ' . $remaining[1];`
+    }
+  }
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'introduction':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Introduction</h2>
+              <p className="mb-4 leading-relaxed">
+                L'API KYC Platform vous permet d'intégrer la vérification d'identité dans votre application. 
+                Cette documentation vous guide à travers les différentes fonctionnalités disponibles.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">URL de base</h3>
+              <div className="rounded-lg bg-muted p-4">
+                <code className="text-sm">https://api.kycplatform.com/api/v1</code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Format des données</h3>
+              <p className="mb-2 leading-relaxed">
+                Toutes les requêtes et réponses utilisent le format JSON. Vous devez inclure le header suivant :
+              </p>
+              <div className="rounded-lg bg-muted p-4">
+                <code className="text-sm">Content-Type: application/json</code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Authentification</h3>
+              <p className="leading-relaxed">
+                Toutes les requêtes API nécessitent une clé API valide. Vous pouvez obtenir votre clé API 
+                depuis votre dashboard après inscription. La clé doit être incluse dans le header Authorization.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Démarrage rapide</h3>
+              <ol className="list-decimal space-y-2 pl-6">
+                <li>Créez un compte sur la plateforme</li>
+                <li>Récupérez votre clé API depuis le dashboard</li>
+                <li>Faites votre première requête API</li>
+                <li>Configurez les webhooks pour recevoir les notifications</li>
+              </ol>
+            </div>
+          </div>
+        )
+
+      case 'authentication':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Authentification</h2>
+              <p className="mb-4 leading-relaxed">
+                L'API utilise des tokens JWT pour l'authentification. Vous devez d'abord obtenir un token 
+                d'accès en utilisant vos identifiants.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Obtenir un token</h3>
+              <p className="mb-3 leading-relaxed">
+                Endpoint : <code className="rounded bg-muted px-2 py-1 text-sm">POST /auth/token</code>
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <p className="mb-2 font-medium">Paramètres requis :</p>
+                  <ul className="space-y-1 pl-6">
+                    <li><code className="text-sm">email</code> - Votre adresse email</li>
+                    <li><code className="text-sm">password</code> - Votre mot de passe</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="mb-2 font-medium">Réponse :</p>
+                  <div className="rounded-lg bg-muted p-4">
+                    <pre className="text-sm">{`{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 3600
+}`}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Utiliser le token</h3>
+              <p className="mb-3 leading-relaxed">
+                Incluez le token dans le header Authorization de toutes vos requêtes :
+              </p>
+              <div className="rounded-lg bg-muted p-4">
+                <code className="text-sm">Authorization: Bearer YOUR_ACCESS_TOKEN</code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Expiration du token</h3>
+              <p className="leading-relaxed">
+                Les tokens expirent après 1 heure. Lorsqu'un token expire, vous recevrez une erreur 401. 
+                Vous devrez alors obtenir un nouveau token.
+              </p>
+            </div>
+          </div>
+        )
+
+      case 'verifications':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Vérifications</h2>
+              <p className="mb-4 leading-relaxed">
+                Le processus de vérification se déroule en plusieurs étapes impliquant votre système, 
+                l'utilisateur final et notre plateforme.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Workflow complet</h3>
+              <ol className="list-decimal space-y-3 pl-6">
+                <li>Votre système initie une vérification via l'API</li>
+                <li>Vous recevez un lien unique de vérification</li>
+                <li>Vous envoyez ce lien à votre utilisateur (email, SMS, etc.)</li>
+                <li>L'utilisateur clique sur le lien et upload ses documents</li>
+                <li>Notre équipe valide les documents</li>
+                <li>Vous recevez une notification webhook du résultat</li>
+              </ol>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">1. Initier une vérification</h3>
+              <p className="mb-3 leading-relaxed">
+                Endpoint : <code className="rounded bg-muted px-2 py-1 text-sm">POST /verifications/initiate</code>
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <p className="mb-2 font-medium">Paramètres requis :</p>
+                  <ul className="space-y-1 pl-6">
+                    <li><code className="text-sm">full_name</code> - Nom complet de la personne</li>
+                    <li><code className="text-sm">email</code> - Email de l'utilisateur</li>
+                    <li><code className="text-sm">external_reference</code> - Votre référence interne</li>
+                    <li><code className="text-sm">phone</code> - Téléphone (optionnel)</li>
+                    <li><code className="text-sm">country</code> - Pays (optionnel)</li>
+                    <li><code className="text-sm">verification_type</code> - Type (document, database, full)</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="mb-2 font-medium">Réponse :</p>
+                  <div className="rounded-lg bg-muted p-4">
+                    <pre className="text-sm">{`{
+  "verification_id": "KYC-2026000001",
+  "verification_url": "https://verify.kycplatform.com/abc123xyz",
+  "status": "pending"
+}`}</pre>
+                  </div>
+                </div>
+                <div className="rounded-lg border-l-4 border-emerald-600 bg-muted p-4">
+                  <p className="text-sm font-medium">Important</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Le <code>verification_url</code> est le lien que vous devez envoyer à votre utilisateur. 
+                    Ce lien expire après 48 heures par défaut.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">2. Envoyer le lien à l'utilisateur</h3>
+              <p className="mb-3 leading-relaxed">
+                Vous devez envoyer le <code>verification_url</code> à votre utilisateur par email, SMS ou 
+                tout autre moyen de communication. L'utilisateur cliquera sur ce lien pour accéder à la 
+                page de vérification.
+              </p>
+              <div className="rounded-lg bg-muted p-4">
+                <p className="text-sm font-medium">Exemple d'email :</p>
+                <pre className="mt-2 text-sm">{`Bonjour [Nom],
+
+Pour finaliser votre inscription, veuillez vérifier 
+votre identité en cliquant sur le lien ci-dessous :
+
+https://verify.kycplatform.com/abc123xyz
+
+Ce lien expire dans 48 heures.
+
+Cordialement,
+L'équipe [Votre Entreprise]`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">3. L'utilisateur soumet ses documents</h3>
+              <p className="mb-3 leading-relaxed">
+                Sur la page de vérification, l'utilisateur pourra :
+              </p>
+              <ul className="list-disc space-y-2 pl-6">
+                <li>Uploader le recto de son document d'identité</li>
+                <li>Uploader le verso (si applicable)</li>
+                <li>Prendre un selfie pour vérification biométrique</li>
+                <li>Saisir le numéro de document</li>
+              </ul>
+              <p className="mt-3 leading-relaxed">
+                Une fois soumis, le statut passe automatiquement à <code className="rounded bg-muted px-2 py-1 text-sm">in_review</code>.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">4. Récupérer une vérification</h3>
+              <p className="mb-3 leading-relaxed">
+                Endpoint : <code className="rounded bg-muted px-2 py-1 text-sm">GET /verifications/:verification_id</code>
+              </p>
+              <div>
+                <p className="mb-2 font-medium">Réponse :</p>
+                <div className="rounded-lg bg-muted p-4">
+                  <pre className="text-sm">{`{
+  "verification_id": "KYC-2026000001",
+  "full_name": "John Doe",
+  "email": "john@example.com",
+  "status": "approved",
+  "document_type": "passport",
+  "document_number": "AB123456",
+  "document_front_url": "https://...",
+  "document_back_url": "https://...",
+  "selfie_url": "https://...",
+  "reviewed_at": "2026-03-16T10:00:00Z",
+  "created_at": "2026-03-16T09:00:00Z"
+}`}</pre>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">5. Lister les vérifications</h3>
+              <p className="mb-3 leading-relaxed">
+                Endpoint : <code className="rounded bg-muted px-2 py-1 text-sm">GET /verifications?page=1&page_size=20&status=approved</code>
+              </p>
+              <div>
+                <p className="mb-2 font-medium">Paramètres optionnels :</p>
+                <ul className="space-y-1 pl-6">
+                  <li><code className="text-sm">status</code> - Filtrer par statut</li>
+                  <li><code className="text-sm">page</code> - Numéro de page (défaut: 1)</li>
+                  <li><code className="text-sm">page_size</code> - Résultats par page (max: 100)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Statuts de vérification</h3>
+              <ul className="space-y-2 pl-6">
+                <li><code className="text-sm">pending</code> - En attente de soumission par l'utilisateur</li>
+                <li><code className="text-sm">in_review</code> - Documents soumis, en cours de validation</li>
+                <li><code className="text-sm">approved</code> - Vérification approuvée</li>
+                <li><code className="text-sm">rejected</code> - Vérification rejetée</li>
+              </ul>
+            </div>
+          </div>
+        )
+
+      case 'webhooks':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Webhooks</h2>
+              <p className="mb-4 leading-relaxed">
+                Les webhooks vous permettent de recevoir des notifications en temps réel lorsque le statut 
+                d'une vérification change.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Configurer un webhook</h3>
+              <p className="mb-3 leading-relaxed">
+                Endpoint : <code className="rounded bg-muted px-2 py-1 text-sm">POST /webhooks</code>
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <p className="mb-2 font-medium">Paramètres requis :</p>
+                  <ul className="space-y-1 pl-6">
+                    <li><code className="text-sm">url</code> - URL de votre endpoint webhook</li>
+                    <li><code className="text-sm">events</code> - Liste des événements à écouter</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Événements disponibles</h3>
+              <ul className="space-y-2 pl-6">
+                <li><code className="text-sm">verification.created</code> - Vérification créée</li>
+                <li><code className="text-sm">verification.processing</code> - Vérification en cours</li>
+                <li><code className="text-sm">verification.completed</code> - Vérification terminée</li>
+                <li><code className="text-sm">verification.failed</code> - Vérification échouée</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Format du payload</h3>
+              <div className="rounded-lg bg-muted p-4">
+                <pre className="text-sm">{`{
+  "event": "verification.completed",
+  "verification_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "verified",
+  "timestamp": "2026-03-16T09:05:00Z",
+  "data": {
+    "confidence_score": 0.95
+  }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Sécurité</h3>
+              <p className="leading-relaxed">
+                Chaque webhook inclut un header <code className="rounded bg-muted px-2 py-1 text-sm">X-Webhook-Signature</code> 
+                que vous pouvez utiliser pour vérifier l'authenticité de la requête.
+              </p>
+            </div>
+          </div>
+        )
+
+      case 'errors':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Codes d'erreur</h2>
+              <p className="mb-4 leading-relaxed">
+                L'API utilise des codes HTTP standards et retourne des messages d'erreur détaillés en JSON.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Codes HTTP</h3>
+              <ul className="space-y-2 pl-6">
+                <li><code className="text-sm">200</code> - Succès</li>
+                <li><code className="text-sm">201</code> - Ressource créée</li>
+                <li><code className="text-sm">400</code> - Requête invalide</li>
+                <li><code className="text-sm">401</code> - Non authentifié</li>
+                <li><code className="text-sm">403</code> - Accès refusé</li>
+                <li><code className="text-sm">404</code> - Ressource non trouvée</li>
+                <li><code className="text-sm">429</code> - Trop de requêtes</li>
+                <li><code className="text-sm">500</code> - Erreur serveur</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Format des erreurs</h3>
+              <div className="rounded-lg bg-muted p-4">
+                <pre className="text-sm">{`{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "Le champ 'document_type' est requis",
+    "details": {
+      "field": "document_type",
+      "reason": "missing_field"
+    }
+  }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Codes d'erreur personnalisés</h3>
+              <ul className="space-y-2 pl-6">
+                <li><code className="text-sm">INVALID_REQUEST</code> - Paramètres manquants ou invalides</li>
+                <li><code className="text-sm">AUTHENTICATION_FAILED</code> - Token invalide ou expiré</li>
+                <li><code className="text-sm">QUOTA_EXCEEDED</code> - Quota mensuel dépassé</li>
+                <li><code className="text-sm">RATE_LIMIT_EXCEEDED</code> - Trop de requêtes</li>
+                <li><code className="text-sm">RESOURCE_NOT_FOUND</code> - Ressource introuvable</li>
+              </ul>
+            </div>
+          </div>
+        )
+
+      case 'rate-limits':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="mb-4 text-2xl font-bold">Limites de taux</h2>
+              <p className="mb-4 leading-relaxed">
+                L'API impose des limites de taux pour garantir la stabilité du service. Les limites varient 
+                selon votre plan d'abonnement.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Limites par plan</h3>
+              <ul className="space-y-2 pl-6">
+                <li><strong>Starter</strong> - 100 requêtes par minute</li>
+                <li><strong>Professional</strong> - 500 requêtes par minute</li>
+                <li><strong>Enterprise</strong> - 2000 requêtes par minute</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Headers de réponse</h3>
+              <p className="mb-3 leading-relaxed">
+                Chaque réponse API inclut des headers indiquant votre utilisation actuelle :
+              </p>
+              <ul className="space-y-1 pl-6">
+                <li><code className="text-sm">X-RateLimit-Limit</code> - Limite totale</li>
+                <li><code className="text-sm">X-RateLimit-Remaining</code> - Requêtes restantes</li>
+                <li><code className="text-sm">X-RateLimit-Reset</code> - Timestamp de réinitialisation</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Dépassement de limite</h3>
+              <p className="mb-3 leading-relaxed">
+                Si vous dépassez votre limite, vous recevrez une erreur 429 avec le message suivant :
+              </p>
+              <div className="rounded-lg bg-muted p-4">
+                <pre className="text-sm">{`{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Limite de taux dépassée. Réessayez dans 60 secondes",
+    "retry_after": 60
+  }
+}`}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-3 text-xl font-semibold">Bonnes pratiques</h3>
+              <ul className="list-disc space-y-2 pl-6">
+                <li>Implémentez un système de retry avec backoff exponentiel</li>
+                <li>Surveillez les headers de limite dans vos réponses</li>
+                <li>Mettez en cache les réponses quand c'est possible</li>
+                <li>Utilisez les webhooks au lieu de polling</li>
+              </ul>
+            </div>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
+      <Navbar />
+      
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
+        {/* Header */}
+        <section className="w-full border-b bg-background py-8">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl font-bold">Documentation API</h1>
+            <p className="mt-2 text-muted-foreground">
+              Guide complet pour intégrer l'API de vérification KYC
+            </p>
+          </div>
+        </section>
+
+        {/* Layout 3 colonnes */}
+        <section className="w-full max-w-full py-8">
+          <div className="container mx-auto px-4">
+            <div className="grid gap-8 lg:grid-cols-12">
+              {/* Menu vertical gauche */}
+              <aside className="lg:col-span-3">
+                <div className="sticky top-24 space-y-6">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Navigation</h3>
+                  {menuSections.map((section, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <h4 className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        {section.title}
+                      </h4>
+                      {section.items.map((item) => {
+                        const Icon = item.icon
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => setActiveSection(item.id)}
+                            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                              activeSection === item.id
+                                ? 'bg-emerald-600 text-white font-medium'
+                                : 'hover:bg-muted/50'
+                            }`}
+                          >
+                            <Icon className="h-4 w-4 flex-shrink-0" />
+                            <span className="flex-1">{item.label}</span>
+                            {activeSection === item.id && (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </aside>
+
+              {/* Contenu central */}
+              <div className="lg:col-span-6">
+                <div className="prose prose-sm max-w-none">
+                  {renderContent()}
+                </div>
+
+                {/* CTA */}
+                <div className="mt-12 rounded-lg bg-muted p-6">
+                  <h3 className="mb-2 text-lg font-semibold">Besoin d'aide ?</h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    Contactez notre équipe support pour toute question
+                  </p>
+                  <Link href="/company/register">
+                    <Button>Créer un compte</Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Exemples de code à droite */}
+              <aside className="lg:col-span-3">
+                <div className="sticky top-24 space-y-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider">Exemples de code</h3>
+                  
+                  {/* Sélecteur de langage */}
+                  <div className="flex flex-wrap gap-2">
+                    {(['curl', 'javascript', 'python', 'php'] as const).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => setActiveLanguage(lang)}
+                        className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                          activeLanguage === lang
+                            ? 'bg-foreground text-background'
+                            : 'bg-muted hover:bg-muted/80'
+                        }`}
+                      >
+                        {lang.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Code */}
+                  <div className="rounded-lg bg-muted p-4">
+                    <pre className="overflow-x-auto text-xs">
+                      <code>{codeExamples[activeSection][activeLanguage]}</code>
+                    </pre>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
